@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cliente - Login e Perfil</title>
+</head>
+<body>
+  <h1>Bem-vindo!</h1>
+
+  <div id="loginSection">
+    <h2>Login</h2>
+    <input type="text" id="login" placeholder="Login">
+    <input type="password" id="senha" placeholder="Senha">
+    <button onclick="login()">Entrar</button>
+    <a href="cadastrarUsuario.html">Deseja se Cadastrar?</a>
+  </div>
+
+  
+
+  <div id="profileSection" style="display: none;">
+    <h2>Minha Conta</h2>
+    <input type="text" id="meuNome" placeholder="Nome">
+    <input type="text" id="meuEndereco" placeholder="Endereço">
+    <input type="email" id="meuEmail" placeholder="Email">
+    <input type="password" id="meuSenha" placeholder="Nova senha (opcional)">
+    <button onclick="atualizar()">Atualizar meus dados</button>
+    <button onclick="excluirConta()">Excluir minha conta</button>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <script>
+    async function login() {
+      const login = document.getElementById('login').value;
+      const senha = document.getElementById('senha').value;
+
+      const res = await fetch('/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // importante para sessões
+        body: JSON.stringify({ login, senha })
+      });
+
+      const data = await res.json();
+      alert(data.message || data.error);
+
+      if (res.ok) {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('profileSection').style.display = 'block';
+      }
+    }
+
+    async function cadastrar() {
+      const nome = document.getElementById('regNome').value;
+      const endereco = document.getElementById('regEndereco').value;
+      const email = document.getElementById('regEmail').value;
+      const login = document.getElementById('regLogin').value;
+      const senha = document.getElementById('regSenha').value;
+      const administrador = document.getElementById('regAdmin').checked;
+
+      const res = await fetch('/user/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, endereco, email, login, senha, administrador })
+      });
+
+      const data = await res.json();
+      alert(data.message || data.error);
+    }
+
+    async function atualizar() {
+      const nome = document.getElementById('meuNome').value;
+      const endereco = document.getElementById('meuEndereco').value;
+      const email = document.getElementById('meuEmail').value;
+      const senha = document.getElementById('meuSenha').value;
+
+      const res = await fetch('/user/me', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ nome, endereco, email, senha })
+      });
+
+      const data = await res.json();
+      alert(data.message || data.error);
+    }
+
+    async function excluirConta() {
+      if (!confirm('Tem certeza que deseja excluir sua conta?')) return;
+
+      const res = await fetch('/user/me', {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      const data = await res.json();
+      alert(data.message || data.error);
+
+      document.getElementById('profileSection').style.display = 'none';
+      document.getElementById('loginSection').style.display = 'block';
+      document.getElementById('registerSection').style.display = 'block';
+    }
+
+    async function logout() {
+      await fetch('/auth/logout', {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      alert('Logout realizado');
+      document.getElementById('profileSection').style.display = 'none';
+      document.getElementById('loginSection').style.display = 'block';
+      document.getElementById('registerSection').style.display = 'block';
+    }
+  </script>
+</body>
+</html>

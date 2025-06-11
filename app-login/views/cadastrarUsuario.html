@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cliente - Login e Perfil</title>
+</head>
+<body>
+  <h1>Bem-vindo!</h1>
+
+
+  <div id="registerSection">
+    <h2>Cadastro</h2>
+    <input type="text" id="regNome" placeholder="Nome">
+    <input type="text" id="regEndereco" placeholder="Endereço">
+    <input type="email" id="regEmail" placeholder="Email">
+    <input type="text" id="regLogin" placeholder="Login">
+    <input type="password" id="regSenha" placeholder="Senha">
+    <label><input type="checkbox" id="regAdmin"> Administrador</label>
+    <button onclick="cadastrar()">Cadastrar</button>
+    <a href="index.html">Voltar</a>
+  </div>
+
+
+
+  <script>
+    
+
+    async function cadastrar() {
+      const nome = document.getElementById('regNome').value;
+      const endereco = document.getElementById('regEndereco').value;
+      const email = document.getElementById('regEmail').value;
+      const login = document.getElementById('regLogin').value;
+      const senha = document.getElementById('regSenha').value;
+      const administrador = document.getElementById('regAdmin').checked;
+
+      const res = await fetch('/user/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, endereco, email, login, senha, administrador })
+      });
+
+      const data = await res.json();
+      alert(data.message || data.error);
+    }
+
+
+  
+  </script>
+</body>
+</html>
